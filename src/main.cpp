@@ -1,7 +1,7 @@
 #include <Arduino.h>
-#include "Si7021.hpp"
+#include "Si702X.hpp"
 
-Si7021 sensor = Si7021();
+Si702X sensor = Si702X();
 void setup() {
     Wire.begin();
     Serial.begin(9600);
@@ -11,7 +11,7 @@ void loop() {
     delay(1000);
     Serial.print("Temperature ");
     Serial.println( sensor.getCelcius() );
-    Serial.print("Humidity  ");
+    Serial.print("Humidity ");
     Serial.println( sensor.getHumidity() );
     // Serial.println(sensor.getDeviceID());
     // Serial.println(sensor.getVersion());

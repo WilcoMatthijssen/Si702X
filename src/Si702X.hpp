@@ -5,7 +5,7 @@
 
 
 
-class Si7021{
+class Si702X{
 private:
     static const uint8_t address{ 0x40 };
     TwoWire & _wire;
@@ -16,7 +16,7 @@ private:
         heatCtrlR = 0x11
     };
 public:
-    Si7021(TwoWire & wire = Wire);
+    Si702X(TwoWire & wire = Wire);
     void reset();
 
     
