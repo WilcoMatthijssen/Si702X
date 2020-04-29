@@ -8,24 +8,41 @@
 class Si702X{
 private:
     static const uint8_t address{ 0x40 };
-    TwoWire & _wire;
+    TwoWire & i2cbus;
+
     enum regAddress: uint8_t{
-        firmware1 = 0x84,
-        firmware2 = 0xB8,
-        heatCtrlW = 0x51,
-        heatCtrlR = 0x11
+        HumidityHoldMaster = 0xE5,
+        HumidityNoHoldMaster = 0xF5,
+
+        TemperatureHoldMaster = 0xE3,
+        TemperatureNoHoldMaster = 0xF3,
+
+        Reset = 0xFE,
+
+        SerialFirst = 0xFA,
+        SerialSecond = 0x0F,
+
+        DeviceIdFirst = 0xFC,
+        DeviceIdSecond = 0xC9,
+
+        FirmwareFirst = 0x84,
+        FirmwareSecond = 0xB8,
+
+        WriteHeatCtrl = 0x51,
+        ReadHeatCtrl = 0x11,
+
+        WriteUser = 0xE6,
+        ReadUser = 0xE7
     };
 public:
-    Si702X(TwoWire & wire = Wire);
+    Si702X(TwoWire & i2cbus = Wire);
     void reset();
 
-    
-    void setHeater(const bool & status);
-    void setLvlHeater(const uint8_t & lvl);
+    void setHeater(const bool & status = 0);
+    void setLvlHeater(const uint8_t & lvl = 0 );
 
     // Humidity
     const double getHumidity() const;
-
 
     // Get temperature
     const double getCelcius() const;

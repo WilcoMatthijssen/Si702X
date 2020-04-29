@@ -1,7 +1,7 @@
 #include "Si702X.hpp"
 
-Si702X::Si702X(TwoWire & wire): _wire(wire){
-
+Si702X::Si702X(TwoWire & i2cbus): i2cbus(i2cbus){
+    
 }
 
 
@@ -10,33 +10,32 @@ void Si702X::reset(){
 
 }
 
-// void Si7021::setHeater(const bool & status);
+void Si702X::setHeater(const bool & status){
 
-// }
+}
 
-
-void Si702X::setLvlHeater(const uint8_t & lvl = 0){
+void Si702X::setLvlHeater(const uint8_t & lvl){
 
 }
 
 
 const double Si702X::getHumidity()const{
-    _wire.beginTransmission(address);
-    _wire.write(0xE5);
-    _wire.endTransmission();
-    _wire.requestFrom(address, 2);
+    i2cbus.beginTransmission(address);
+    i2cbus.write(regAddress::HumidityHoldMaster);
+    i2cbus.endTransmission();
+    i2cbus.requestFrom(address, 2);
 
-    int16_t humidity  = (_wire.read() << 8) + _wire.read();
+    int16_t humidity  = (i2cbus.read() << 8) + i2cbus.read();
     return ((125 * humidity) / 65536.0) - 6;
 }
 
 const double Si702X::getCelcius() const{
-    _wire.beginTransmission(address);
-    _wire.write(0xE3);
-    _wire.endTransmission();
-    _wire.requestFrom(address, 2);
+    i2cbus.beginTransmission(address);
+    i2cbus.write(regAddress::TemperatureHoldMaster);
+    i2cbus.endTransmission();
+    i2cbus.requestFrom(address, 2);
 
-    int16_t temp  = (_wire.read() << 8) + _wire.read();
+    int16_t temp  = (i2cbus.read() << 8) + i2cbus.read();
     return ((175.72 * temp) / 65536.0) - 46.85;
 }
 const double Si702X::getKelvin() const{
@@ -78,13 +77,13 @@ const double Si702X::getRomer() const{
 
 
 const String Si702X::getDeviceID()const{
-    _wire.beginTransmission(address);
-    _wire.write(0xFC);
-    _wire.write(0xC9);
-    _wire.endTransmission(false);
+    i2cbus.beginTransmission(address);
+    i2cbus.write(regAddress::DeviceIdFirst);
+    i2cbus.write(regAddress::DeviceIdSecond);
+    i2cbus.endTransmission(false);
 
-    _wire.requestFrom(address, 1);
-    switch(_wire.read()){
+    i2cbus.requestFrom(address, 1);
+    switch(i2cbus.read()){
         case 0x00:
         case 0xFF:
             return "Engineering sample";
@@ -104,13 +103,13 @@ const String Si702X::getDeviceID()const{
 }
 
 const String Si702X::getVersion() const{
-    _wire.beginTransmission(address);
-    _wire.write(0x84);
-    _wire.write(0xB8);
-    _wire.endTransmission(false);
+    i2cbus.beginTransmission(address);
+    i2cbus.write(regAddress::FirmwareFirst);
+    i2cbus.write(regAddress::FirmwareSecond);
+    i2cbus.endTransmission(false);
 
-    _wire.requestFrom(address, 1);
-    switch(_wire.read()){
+    i2cbus.requestFrom(address, 1);
+    switch(i2cbus.read()){
         case 0x20:
             return "Firmware version 2.0";
 
