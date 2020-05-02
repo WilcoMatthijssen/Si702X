@@ -7,10 +7,10 @@
 
 class Si702X{
 private:
-    static const uint8_t address{ 0x40 };
+    static const byte address{ 0x40 };
     TwoWire & i2cbus;
 
-    enum regAddress: uint8_t{
+    enum regAddress: byte{
         HumidityHoldMaster = 0xE5,
         HumidityNoHoldMaster = 0xF5,
 
@@ -38,8 +38,13 @@ public:
     Si702X(TwoWire & i2cbus = Wire);
     void reset();
 
-    void setHeater(const bool & status = 0);
-    void setLvlHeater(const uint8_t & lvl = 0 );
+
+
+    // add resolution
+    
+    bool enableHeater();
+    bool disableHeater();
+    bool setHeater(const byte & level = 0 );
 
     // Humidity
     const double getHumidity() const;
@@ -54,7 +59,7 @@ public:
     const double getReaumer() const;
     const double getRomer() const;
 
-
+    const int16_t getSerial() const;
     const String getDeviceID() const;
     const String getVersion() const;
 

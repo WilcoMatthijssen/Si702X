@@ -13,6 +13,7 @@ void loop() {
     Serial.println( sensor.getCelcius() );
     Serial.print("Humidity ");
     Serial.println( sensor.getHumidity() );
-    // Serial.println(sensor.getDeviceID());
-    // Serial.println(sensor.getVersion());
+    Serial.println(sensor.getSerial());
+    Serial.println(sensor.getDeviceID());
+    Serial.println(sensor.getVersion());
 }
