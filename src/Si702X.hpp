@@ -34,33 +34,90 @@ private:
         WriteUser = 0xE6,
         ReadUser = 0xE7
     };
+
 public:
+
+    // Constructor
+    // If no argument is given the standard Wire will be used.
     Si702X(TwoWire & i2cbus = Wire);
-    void reset();
 
 
 
-    // add resolution
-    
-    bool enableHeater();
-    bool disableHeater();
-    bool setHeater(const byte & level = 0 );
+    // Config
+
+    // Resets the sensors settings
+    byte reset();
+
+    // Enables the heater on the sensor.
+    // If heater level is not configured it will not heat up (see setHeater(level) ).
+    byte enableHeater();
+
+    // Disables the heater on the sensor.
+    // Does not change configured level of heater
+    byte disableHeater();
+
+    // Sets the heat of the sensor.
+    // The heater can be set to a level between 0 - 15. The higher number the higher the heat.
+    // A level above 15 will return 5 and not change the heater level.
+    // Heater needs to be enabled to take effect (see enableHeater() ).
+    // If no argument is given the level will be 0 i.e. off
+    byte setHeater(const byte & level = 0 );
+
+    // WIP
+    // Measurement Resolution:
+    //     RH       Temp
+    // 00: 12 bit   14 bit - Default
+    // 01: 8 bit    12 bit
+    // 10: 10 bit   13 bit
+    // 11: 11 bit   11 bit
+    byte setResolution(const bool & a, const bool & b);
+
+
 
     // Humidity
-    const double getHumidity() const;
+    
+    // Get relative humidity from sensor
+    const double getRH() const;
 
-    // Get temperature
+
+
+    // Temperature
+    
+    // Get temperature reading from sensor in Celcius
     const double getCelcius() const;
+
+    // Get temperature reading from sensor in Kelvin
     const double getKelvin() const;
+
+    // Get temperature reading from sensor in Fahrenheit
     const double getFahrenheit() const;
+
+    // Get temperature reading from sensor in Newton
     const double getNewton() const;
+
+    // Get temperature reading from sensor in Rankine
     const double getRankine() const;
+
+    // Get temperature reading from sensor in Delisle
     const double getDelisle() const;
-    const double getReaumer() const;
+
+    // Get temperature reading from sensor in Reaumur
+    const double getReaumur() const;
+
+    // Get temperature reading from sensor in Romer
     const double getRomer() const;
 
+
+
+    // Information
+
+    // Get serial number from sensor
     const int16_t getSerial() const;
+
+    // Get device id from sensor
     const String getDeviceID() const;
+
+    // Get version from sensor
     const String getVersion() const;
 
 };
