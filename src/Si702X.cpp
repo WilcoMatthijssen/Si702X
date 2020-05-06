@@ -4,7 +4,7 @@ Si702X::Si702X(TwoWire & i2cbus): i2cbus(i2cbus){
     
 }
 
-byte Si702X::reset(){
+const byte Si702X::reset(){
     // Send reset command to sensor
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::Reset);
@@ -24,7 +24,7 @@ byte Si702X::reset(){
 }
 
 
-bool Si702X::disableHeater(){
+const byte Si702X::disableHeater(){
     // Read the user config 
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::ReadUser);
@@ -55,7 +55,7 @@ bool Si702X::disableHeater(){
 }
 
 
-bool Si702X::enableHeater(){
+const byte Si702X::enableHeater(){
     // Read the user config 
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::ReadUser);
@@ -91,7 +91,7 @@ bool Si702X::enableHeater(){
 }
 
 
-byte Si702X::setHeater(const byte & level){
+const byte Si702X::setHeater(const byte & level){
     // Stop if level is too high
     if(level > 0b11110000){
         return 5;
@@ -126,8 +126,37 @@ byte Si702X::setHeater(const byte & level){
     return i2cbus.endTransmission();
 }
 
+const byte Si702X::setResolution(const bool & a, const bool & b){
+    i2cbus.beginTransmission(address);
+    i2cbus.write(regAddress::ReadHeatCtrl);
+    byte info = i2cbus.endTransmission();
+    if(info){
+        return info;
+    }
+    
+    // Keep the non-Resolution bits and change the Resolution bits to the given precision.
+    i2cbus.requestFrom(address, 1);
+    byte dataToWrite = i2cbus.read() & 0b01111110;
+    dataToWrite |= a;
+    dataToWrite |= b << 8;
 
-const double Si702X::getHumidity()const{
+    // Write the data with level to the sensor.
+    i2cbus.beginTransmission(address);
+    i2cbus.write(regAddress::WriteHeatCtrl);
+    i2cbus.write(dataToWrite);
+
+    //byte, which indicates the status of the transmission:
+    // 0:success
+    // 1:data too long to fit in transmit buffer
+    // 2:received NACK on transmit of address
+    // 3:received NACK on transmit of data
+    // 4:other error
+    // https://www.arduino.cc/en/Reference/WireEndTransmission
+    return i2cbus.endTransmission();
+}
+
+
+const double Si702X::getRH() const{
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::HumidityHoldMaster);
     i2cbus.endTransmission();

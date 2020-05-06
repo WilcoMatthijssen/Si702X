@@ -46,31 +46,31 @@ public:
     // Config
 
     // Resets the sensors settings
-    byte reset();
+    const byte reset();
 
     // Enables the heater on the sensor.
     // If heater level is not configured it will not heat up (see setHeater(level) ).
-    byte enableHeater();
+    const byte enableHeater();
 
     // Disables the heater on the sensor.
     // Does not change configured level of heater
-    byte disableHeater();
+    const byte disableHeater();
 
     // Sets the heat of the sensor.
     // The heater can be set to a level between 0 - 15. The higher number the higher the heat.
     // A level above 15 will return 5 and not change the heater level.
     // Heater needs to be enabled to take effect (see enableHeater() ).
     // If no argument is given the level will be 0 i.e. off
-    byte setHeater(const byte & level = 0 );
+    const byte setHeater(const byte & level = 0 );
 
-    // WIP
+    // Changes the resolution of RH and temperature measurements.
     // Measurement Resolution:
     //     RH       Temp
     // 00: 12 bit   14 bit - Default
     // 01: 8 bit    12 bit
     // 10: 10 bit   13 bit
     // 11: 11 bit   11 bit
-    byte setResolution(const bool & a, const bool & b);
+    const byte setResolution(const bool & a = 0, const bool & b = 0);
 
 
 
