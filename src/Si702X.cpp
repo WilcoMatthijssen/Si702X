@@ -68,7 +68,7 @@ const byte Si702X::enableHeater(){
 
     // Stop if voltage is too low
     if( readData & 0b01000000){
-        return 5;
+        return 6;
     }
 
     // Set the heater enable bit
@@ -85,7 +85,7 @@ const byte Si702X::enableHeater(){
     // 2:received NACK on transmit of address
     // 3:received NACK on transmit of data
     // 4:other error
-    // 5:voltage too low
+    // 6:voltage too low
     // https://www.arduino.cc/en/Reference/WireEndTransmission
     return i2cbus.endTransmission();
 }
@@ -156,7 +156,7 @@ const byte Si702X::setResolution(const bool & a, const bool & b){
 }
 
 
-const double Si702X::getRH() const{
+const float Si702X::getRH() const{
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::HumidityHoldMaster);
     i2cbus.endTransmission();
@@ -168,7 +168,7 @@ const double Si702X::getRH() const{
 }
 
 
-const double Si702X::getCelcius() const{
+const float Si702X::getCelcius() const{
     // Read data from sensor
     // Might change address written
     // Havent found reason for hold master and not hold master
@@ -183,7 +183,7 @@ const double Si702X::getCelcius() const{
 }
 
 
-const double Si702X::getKelvin() const{
+const float Si702X::getKelvin() const{
     // An absolute scale of temperature. 
     // The temperature difference of one Kelvin degree is defined as equal to one Celcius degree.
 
@@ -192,13 +192,13 @@ const double Si702X::getKelvin() const{
 }
 
 
-const double Si702X::getFahrenheit() const{
+const float Si702X::getFahrenheit() const{
     // Converts Celcius to Fahrenheit
     return getCelcius() * 9.0 / 5.0 + 32;
 }
 
 
-const double Si702X::getNewton() const{
+const float Si702X::getNewton() const{
     // The Newton scale is a temperature scale that sets a fixed zero point equal to the freezing point water. 
     // The scale uses both arithmetic progression and geometric progression. 
     // The scale defines 18 reference points and the corresponding "degrees of heat" and geometric progressions.
@@ -208,7 +208,7 @@ const double Si702X::getNewton() const{
 }
 
 
-const double Si702X::getRankine() const{
+const float Si702X::getRankine() const{
     // An absolute scale of temperature. 
     // The temperature difference of one Rankine degree is defined as equal to one Fahrenheit degree.
     // Fahrenheit Equivalent for Kelvin to Celcius.
@@ -218,7 +218,7 @@ const double Si702X::getRankine() const{
 }
 
 
-const double Si702X::getDelisle() const{
+const float Si702X::getDelisle() const{
     // The Delisle scale is a scale to measure temperature. It was introduced by French astronomer Joseph-Nicolas Delisle in 1732. 
     // 0 Delisle is equal to the boiling point of water under normal pressure. 
     // Josias Weitbrecht recalibrated the theromometer in 1738, so that the melting point of ice was taken into account. Ice melts at 150°De.
@@ -229,7 +229,7 @@ const double Si702X::getDelisle() const{
 }
 
 
-const double Si702X::getReaumur() const{
+const float Si702X::getReaumur() const{
     //The Réaumur scale is a temperature scale for which the freezing and boiling points of water are defined as 0 and 80 degrees. 
     // The scale is named for René Antoine Ferchault de Réaumur, who first proposed a similar scale in 1730.
 
@@ -239,7 +239,7 @@ const double Si702X::getReaumur() const{
 
 
 
-const double Si702X::getRomer() const{
+const float Si702X::getRomer() const{
     // In this scale, the zero was initially set using freezing brine. 
     // The boiling point of water was defined as 60 degrees. 
     // The lower fixed point is the freezing point of water at precisely 7.5 degrees. 

@@ -77,35 +77,35 @@ public:
     // Humidity
     
     // Get relative humidity from sensor
-    const double getRH() const;
+    const float getRH() const;
 
 
 
     // Temperature
     
     // Get temperature reading from sensor in Celcius
-    const double getCelcius() const;
+    const float getCelcius() const;
 
     // Get temperature reading from sensor in Kelvin
-    const double getKelvin() const;
+    const float getKelvin() const;
 
     // Get temperature reading from sensor in Fahrenheit
-    const double getFahrenheit() const;
+    const float getFahrenheit() const;
 
     // Get temperature reading from sensor in Newton
-    const double getNewton() const;
+    const float getNewton() const;
 
     // Get temperature reading from sensor in Rankine
-    const double getRankine() const;
+    const float getRankine() const;
 
     // Get temperature reading from sensor in Delisle
-    const double getDelisle() const;
+    const float getDelisle() const;
 
     // Get temperature reading from sensor in Reaumur
-    const double getReaumur() const;
+    const float getReaumur() const;
 
     // Get temperature reading from sensor in Romer
-    const double getRomer() const;
+    const float getRomer() const;
 
 
 
