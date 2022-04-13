@@ -1,8 +1,8 @@
 # Si702X sensor
-Writen by Wilco Matthijssen for the Si7020 and Si7021 sensors.  
-The datasheet I used can be found at [this website](https://www.silabs.com/documents/public/data-sheets/Si7021-A20.pdf).
+Arduino library for Si7020 and Si7021 sensors.  
 
-The library can be used to measure the temperature in various scales and measure the relative humidity. This library also makes the heater for removing frost in the sensor available for use and various other features.
+Used to measure temperature in various scales, measure the relative humidity and implements a heater for frost removal.
+
 
 ## Usage
 This is an example how you could use this library.
@@ -141,3 +141,7 @@ Returns the device ID of the sensor in a string
 
 ####    getSerial()
 Returns the serial number of the sensor in a 16bit signed int.
+
+
+## Used information
+- [Datasheet](https://www.silabs.com/documents/public/data-sheets/Si7021-A20.pdf).

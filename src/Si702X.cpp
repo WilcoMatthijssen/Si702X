@@ -4,7 +4,7 @@ Si702X::Si702X(TwoWire & i2cbus): i2cbus(i2cbus){
     
 }
 
-const byte Si702X::reset(){
+byte Si702X::reset(){
     // Send reset command to sensor
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::Reset);
@@ -18,14 +18,14 @@ const byte Si702X::reset(){
     // https://www.arduino.cc/en/Reference/WireEndTransmission
     return i2cbus.endTransmission();
 
-    // Result is:
+    // Result:
     // User register 1 = 0011_1010
     // Heater control register =  0000_0000
 }
 
 
-const byte Si702X::disableHeater(){
-    // Read the user config 
+byte Si702X::disableHeater(){
+    // Retrieve user config 
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::ReadUser);
     byte info = i2cbus.endTransmission();
@@ -35,10 +35,10 @@ const byte Si702X::disableHeater(){
 
     i2cbus.requestFrom(address, 1);
 
-    // Clear the heater enable bit
+    // Clear heater enable bit
     byte writeData = i2cbus.read() & 0b11111011;
 
-    // Write the user config with the heater enable bit set
+    // Write user config with the heater enable bit set
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::WriteUser);
     i2cbus.write(writeData);
@@ -55,8 +55,8 @@ const byte Si702X::disableHeater(){
 }
 
 
-const byte Si702X::enableHeater(){
-    // Read the user config 
+byte Si702X::enableHeater(){
+    // Retrieve user config 
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::ReadUser);
     byte info = i2cbus.endTransmission();
@@ -66,15 +66,15 @@ const byte Si702X::enableHeater(){
     i2cbus.requestFrom(address, 1);
     byte readData = i2cbus.read();
 
-    // Stop if voltage is too low
+    // Return if voltage is too low
     if( readData & 0b01000000){
         return 6;
     }
 
-    // Set the heater enable bit
+    // Set heater enable bit
     byte writeData = readData | 0b00000100;
 
-    // Write the user config with the heater enable bit set
+    // Write user config to sensor
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::WriteUser);
     i2cbus.write(writeData);
@@ -91,13 +91,12 @@ const byte Si702X::enableHeater(){
 }
 
 
-const byte Si702X::setHeater(const byte & level){
-    // Stop if level is too high
+byte Si702X::setHeater(const byte & level){
+    // Exit when given level exceeds heater range and is set to change other bits.
+    // The datasheet recommends not changing bits not related to heater for future compatibility.
     if(level > 0b11110000){
         return 5;
     }
-
-    // The datasheet recommends not changing the bits not related to the heater for future compatibility
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::ReadHeatCtrl);
     byte info = i2cbus.endTransmission();
@@ -105,12 +104,12 @@ const byte Si702X::setHeater(const byte & level){
         return info;
     }
     
-    // Keep the non-Heater bits and change the heater bits to the given level.
+    // Keep non-Heater bits and change heater bits to given level.
     i2cbus.requestFrom(address, 1);
     byte dataToWrite = i2cbus.read() & 0b11110000;   
     dataToWrite |= level;
 
-    // Write the data with level to the sensor.
+    // Write heater-config to sensor.
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::WriteHeatCtrl);
     i2cbus.write(dataToWrite);
@@ -126,21 +125,20 @@ const byte Si702X::setHeater(const byte & level){
     return i2cbus.endTransmission();
 }
 
-const byte Si702X::setResolution(const bool & a, const bool & b){
+byte Si702X::setResolution(const bool & a, const bool & b){
+    // Retrieve config and only change resolution bits with given precision.
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::ReadHeatCtrl);
     byte info = i2cbus.endTransmission();
     if(info){
         return info;
     }
-    
-    // Keep the non-Resolution bits and change the Resolution bits to the given precision.
     i2cbus.requestFrom(address, 1);
     byte dataToWrite = i2cbus.read() & 0b01111110;
     dataToWrite |= a;
     dataToWrite |= b << 8;
 
-    // Write the data with level to the sensor.
+    // Write new config back to sensor.
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::WriteHeatCtrl);
     i2cbus.write(dataToWrite);
@@ -156,24 +154,23 @@ const byte Si702X::setResolution(const bool & a, const bool & b){
 }
 
 
-const float Si702X::getRH() const{
+float Si702X::getRH() const{
+    // Retrieve humidity data from sensor
     i2cbus.beginTransmission(address);
-    i2cbus.write(regAddress::HumidityHoldMaster);
+    i2cbus.write(regAddress::HumidityHoldMaster); // Havent found reason for hold master and not hold master
     i2cbus.endTransmission();
     i2cbus.requestFrom(address, 2);
 
-
-    int16_t humidity  = (i2cbus.read() << 8) + i2cbus.read();
+    // Convert data to RH
+    uint16_t humidity  = (i2cbus.read() << 8) + i2cbus.read();
     return ((125.0 * humidity) / 65536.0) - 6;
 }
 
 
-const float Si702X::getCelcius() const{
-    // Read data from sensor
-    // Might change address written
-    // Havent found reason for hold master and not hold master
+float Si702X::getCelcius() const{
+    // Retrieve temperature data from sensor
     i2cbus.beginTransmission(address);
-    i2cbus.write(regAddress::TemperatureHoldMaster);
+    i2cbus.write(regAddress::TemperatureHoldMaster); // Havent found reason for hold master and not hold master
     i2cbus.endTransmission();
     i2cbus.requestFrom(address, 2);
 
@@ -183,7 +180,7 @@ const float Si702X::getCelcius() const{
 }
 
 
-const float Si702X::getKelvin() const{
+float Si702X::getKelvin() const{
     // An absolute scale of temperature. 
     // The temperature difference of one Kelvin degree is defined as equal to one Celcius degree.
 
@@ -192,13 +189,13 @@ const float Si702X::getKelvin() const{
 }
 
 
-const float Si702X::getFahrenheit() const{
+float Si702X::getFahrenheit() const{
     // Converts Celcius to Fahrenheit
     return getCelcius() * 9.0 / 5.0 + 32;
 }
 
 
-const float Si702X::getNewton() const{
+float Si702X::getNewton() const{
     // The Newton scale is a temperature scale that sets a fixed zero point equal to the freezing point water. 
     // The scale uses both arithmetic progression and geometric progression. 
     // The scale defines 18 reference points and the corresponding "degrees of heat" and geometric progressions.
@@ -208,17 +205,17 @@ const float Si702X::getNewton() const{
 }
 
 
-const float Si702X::getRankine() const{
+float Si702X::getRankine() const{
     // An absolute scale of temperature. 
     // The temperature difference of one Rankine degree is defined as equal to one Fahrenheit degree.
     // Fahrenheit Equivalent for Kelvin to Celcius.
 
     // Converts Celcius to Rankine
-    return ( getCelcius() + 273.15 ) * 9.0 / 5.0;
+    return (getCelcius() + 273.15) * 9.0 / 5.0;
 }
 
 
-const float Si702X::getDelisle() const{
+float Si702X::getDelisle() const{
     // The Delisle scale is a scale to measure temperature. It was introduced by French astronomer Joseph-Nicolas Delisle in 1732. 
     // 0 Delisle is equal to the boiling point of water under normal pressure. 
     // Josias Weitbrecht recalibrated the theromometer in 1738, so that the melting point of ice was taken into account. Ice melts at 150°De.
@@ -229,7 +226,7 @@ const float Si702X::getDelisle() const{
 }
 
 
-const float Si702X::getReaumur() const{
+float Si702X::getReaumur() const{
     //The Réaumur scale is a temperature scale for which the freezing and boiling points of water are defined as 0 and 80 degrees. 
     // The scale is named for René Antoine Ferchault de Réaumur, who first proposed a similar scale in 1730.
 
@@ -239,7 +236,7 @@ const float Si702X::getReaumur() const{
 
 
 
-const float Si702X::getRomer() const{
+float Si702X::getRomer() const{
     // In this scale, the zero was initially set using freezing brine. 
     // The boiling point of water was defined as 60 degrees. 
     // The lower fixed point is the freezing point of water at precisely 7.5 degrees. 
@@ -252,28 +249,28 @@ const float Si702X::getRomer() const{
 }
 
 
-const int16_t Si702X::getSerial() const{
-    // Request serial from sensor
+int16_t Si702X::getSerial() const{
+    // Retrieve serial from sensor
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::SerialFirst);
     i2cbus.write(regAddress::SerialSecond);
     i2cbus.endTransmission(false);
     i2cbus.requestFrom(address, 2);
 
-    // Add 2 bytes together to get the full serial
+    // Serial is stored in 2 bytes so we add them together
     return (i2cbus.read() << 8) + i2cbus.read();
 }
 
 
-const String Si702X::getDeviceID()const{
-    // Request device id from sensor
+String Si702X::getDeviceID()const{
+    // Retrieve device id from sensor
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::DeviceIdFirst);
     i2cbus.write(regAddress::DeviceIdSecond);
     i2cbus.endTransmission(false);
     i2cbus.requestFrom(address, 1);
 
-    // Find corrosponding code and return the device ID
+    // Find corresponding code and return the device ID
     switch(i2cbus.read()){
         case 0x00:
         case 0xFF:
@@ -294,15 +291,15 @@ const String Si702X::getDeviceID()const{
 }
 
 
-const String Si702X::getVersion() const{
-    // Request firmware version from sensor
+String Si702X::getVersion() const{
+    // Retrieve firmware version from sensor
     i2cbus.beginTransmission(address);
     i2cbus.write(regAddress::FirmwareFirst);
     i2cbus.write(regAddress::FirmwareSecond);
     i2cbus.endTransmission(false);
     i2cbus.requestFrom(address, 1);
 
-    // Find corrosponding code and return the firmware version
+    // Find corresponding code and return the firmware version
     switch(i2cbus.read()){
         case 0x20:
             return "Firmware version 2.0";
