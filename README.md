@@ -1,5 +1,6 @@
 # Si702X sensor
-Arduino library for Si7020 and Si7021 sensors.  
+Arduino library for Si7020 and Si7021 sensors. 
+[![Build](https://github.com/WilcoMatthijssen/Si702X/actions/workflows/platformio_run.yml/badge.svg)](https://github.com/WilcoMatthijssen/Si702X/actions/workflows/platformio_run.yml)  
 
 Used to measure temperature in various scales, measure the relative humidity and implements a heater for frost removal.
 
