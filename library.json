@@ -1,17 +1,17 @@
 {
     "name": "Si702X",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "repository":
     {
         "type": "git",
         "url": "https://github.com/WilcoMatthijssen/Si702X.git"
     },
     "headers": "Si702X.hpp",
-    "examples":{
+    "examples":[{
         "name": "Example",
-        "files": "example.ino",
+        "files": ["example.ino"],
         "base": "src"
-    },
+    }],
     "authors": {
         "name": "Wilco Matthijssen",
         "email": "john@doe.com",
